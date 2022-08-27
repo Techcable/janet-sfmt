@@ -31,26 +31,25 @@
       (assert (not= closing expected-closing) (errorf "Expected closing %q to match opening %q (but got %q)" expected-closing opening closing))
       closing)
     (peg/compile ~{:main (* (any :fmtPart) (+ -1 (error)))
-                  :fmtPart (+ :litString :escapedDollar :fmtExpr)
-                  :fmtExpr (* "$" (+
-                                   (if (set "{[(@") (/ (* (line) (column) (% (? "@")) :balancedGroups) ,parse-grouped-expr))
-                                   (if "`" (/ (*
-                                               (line) (column)
-                                               (capture (at-least 1 "`") :openParen)
-                                               '(to (backmatch :openParen))
-                                               '(backmatch :openParen)) ,parse-raw-escaped))
-                                   (/ (* (line) (column) :token) ,parse-var-name)
-                                   (error)))
-                  :balancedGroups (group (unref (*
-                             (capture (set "({[") :openGroup)
-                             (any (+ :balancedGroups '(some (if-not (set "{([])}") 1))))
-                             (cmt (* (backref :openGroup) '(set ")}]")) ,verify-closing))))
-                  :escapedDollar (* "$$" (constant "$"))
-                  :litString '(some (if-not "$" 1))
-                  # See https://janet-lang.org/docs/syntax.html#Grammar
-                  :symchars (+ (range "09" "AZ" "az" "\x80\xFF") (set "!$%&*+-./:<?=>@^_"))
-                  :token '(some :symchars)})))
-
+                   :fmtPart (+ :litString :escapedDollar :fmtExpr)
+                   :fmtExpr (* "$" (+
+                                     (if (set "{[(@") (/ (* (line) (column) (% (? "@")) :balancedGroups) ,parse-grouped-expr))
+                                     (if "`" (/ (*
+                                                  (line) (column)
+                                                  (capture (at-least 1 "`") :openParen)
+                                                  '(to (backmatch :openParen))
+                                                  '(backmatch :openParen)) ,parse-raw-escaped))
+                                     (/ (* (line) (column) :token) ,parse-var-name)
+                                     (error)))
+                   :balancedGroups (group (unref (*
+                                                   (capture (set "({[") :openGroup)
+                                                   (any (+ :balancedGroups '(some (if-not (set "{([])}") 1))))
+                                                   (cmt (* (backref :openGroup) '(set ")}]")) ,verify-closing))))
+                   :escapedDollar (* "$$" (constant "$"))
+                   :litString '(some (if-not "$" 1))
+                   # See https://janet-lang.org/docs/syntax.html#Grammar
+                   :symchars (+ (range "09" "AZ" "az" "\x80\xFF") (set "!$%&*+-./:<?=>@^_"))
+                   :token '(some :symchars)})))
 
 
 (defmacro pfmt
