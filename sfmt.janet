@@ -52,19 +52,21 @@
                    :token '(some :symchars)})))
 
 
-(defmacro pfmt
-  ````Evaluate a Kotlin-format string
+(defmacro sfmt
+  ````Evaluate a format string, permitting string substitution with `$`
   
-  Quasi-quoting is done based on the `$` symbol:
-  - Use $() to quote parens
-  - Use $foo to quote variables,
-  - Use $[] and ${} to quote tuples & structs
-  - Use $@[] and $@{} to quote 
+  Substituion done based on the `$` symbol:
+  - Use $(f a) to quote the value of `(string (f a))` into the result
+  - Use $foo to quote `(string expr`
+  - Use $[] and ${} to quote tuples & structs (NOTE: Currently useless)
+  - Use $@[] and $@{} to quote arrays and (Also useless)
   - Anything in the form $``body`` is passed directly to the parser to eveluate.
   - Use $$ to escape the dolar sign itself (equivalent to $`"$"`)
                                                               
   Note that using ${} and @[] are pretty much useless right now,
-  since the (string) function doesn't support them (string []) gives "<tuple 0x60000352C080>"````
+  since the (string) function doesn't support them (string []) gives "<tuple 0x60000352C080>"
+  
+  At runtime, everything should compile away to an invocation of the string macro````
   [format-string]
   (def template (peg/match fmt-peg format-string))
   (defn translate [form]
@@ -76,10 +78,3 @@
         _ (errorf "Unexpected form: %q" form))))
   (def subst (mapcat translate template))
   ~(string ,;subst))
-
-
-(def- [bar baz] [3 "two?"]) # TODO: For testing only
-
-(pp (pfmt "foo $(+ bar 3) foo $baz"))
-
-(pp (pfmt "foo $$ $`` `$$$$$` `` bar $(identity baz)"))
