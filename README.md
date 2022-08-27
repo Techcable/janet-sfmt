@@ -1,8 +1,10 @@
 Simple format-strings for Janet
 ===============================
-In the style of python `f"foo {bar}"` or kotlin "foo $bar" (syntatically closer to the latter)
+Lightweight format strings for Janet "3 $(2 + 2) 5" or "3 $var 5" 
 
-Implemented as a macro.
+Inspired by kotlin "foo $bar" strings or Python f"foo "
+
+Implemented as a macro wrapper around the [`string`](https://janet-lang.org/api/index.html#string) function.
 
 ## Examples
 ```janet
@@ -13,6 +15,5 @@ Implemented as a macro.
 
 Unlike [spork/temple] this doees absolutely no HTML escaping at all.
 
-At runtime, everything boils down to an invocation of [`string`](https://janet-lang.org/api/index.html#string) function.
-
-So `(sfmt "foo $var baz")` becomes `(string "foo " var baz)` after macro expansion. 
+At runtime, everything boils down to an invocation of `string`.
+So `(sfmt "foo $var baz")` becomes `(string "foo " var " baz")` after macro expansion (which is almost exactly what a user would write by hand). 
